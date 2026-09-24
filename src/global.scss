@@ -36,3 +36,42 @@
   background-size: 400px 400px;
   opacity: 0.6;
 }
+
+/* Footer institucional de Global Certified English Center */
+.app-global-footer {
+  width: 100%;
+  margin-top: 36px;
+  padding: 24px 16px 28px 16px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+
+  .footer-content {
+    max-width: 640px;
+    margin: 0 auto;
+
+    .copyright-text {
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      margin: 0 0 6px 0;
+      line-height: 1.45;
+
+      strong {
+        color: #38bdf8;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    .sub-text {
+      color: #94a3b8;
+      font-size: 0.75rem;
+      margin: 0;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+  }
+}
