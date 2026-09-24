@@ -191,6 +191,29 @@
   gap: 8px;
 }
 
+.guest-action-container {
+  margin-top: 14px;
+}
+
+.guest-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  color: #334155;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #0284c7;
+    color: #0284c7;
+  }
+}
+
 .specs-chips {
   display: flex;
   justify-content: center;

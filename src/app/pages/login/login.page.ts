@@ -123,6 +123,8 @@ export class LoginPage {
         this.errorMessage = 'Correo o contraseña incorrectos.';
       } else if (err.code === 'auth/email-already-in-use') {
         this.errorMessage = 'Este correo ya tiene una cuenta. Elige "Iniciar Sesión".';
+      } else if (err.code === 'auth/operation-not-allowed') {
+        this.errorMessage = 'El proveedor de Correo/Contraseña aún no está activo en Firebase Console > Authentication > Sign-in method. Puedes usar Google o el botón de Modo Libre.';
       } else {
         this.errorMessage = err.message || 'Error al conectar con la base espacial.';
       }

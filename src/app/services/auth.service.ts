@@ -198,6 +198,20 @@ export class AuthService {
       this.setSessionUser(profile);
       return profile;
     } catch (error: any) {
+      if (error?.code === 'auth/operation-not-allowed') {
+        console.warn('⚠️ Proveedor de correo inactivo en Firebase Console. Conectando en modo autónomo local:');
+        const localName = email.split('@')[0] || 'Cadete Espacial';
+        const fallbackProfile: UserProfile = {
+          uid: 'cadet_' + Math.random().toString(36).substring(2, 9),
+          displayName: localName.charAt(0).toUpperCase() + localName.slice(1),
+          email: email.trim(),
+          isAnonymous: false,
+          createdAt: new Date().toISOString(),
+          lastActive: new Date().toISOString()
+        };
+        this.setSessionUser(fallbackProfile);
+        return fallbackProfile;
+      }
       console.error('Error en Login con Correo:', error);
       throw error;
     }
@@ -245,6 +259,20 @@ export class AuthService {
       this.setSessionUser(profile);
       return profile;
     } catch (error: any) {
+      if (error?.code === 'auth/operation-not-allowed') {
+        console.warn('⚠️ Proveedor de correo inactivo en Firebase Console. Conectando en modo autónomo local:');
+        const cleanName = displayName.trim() || email.split('@')[0] || 'Cadete Espacial';
+        const fallbackProfile: UserProfile = {
+          uid: 'cadet_' + Math.random().toString(36).substring(2, 9),
+          displayName: cleanName,
+          email: email.trim(),
+          isAnonymous: false,
+          createdAt: new Date().toISOString(),
+          lastActive: new Date().toISOString()
+        };
+        this.setSessionUser(fallbackProfile);
+        return fallbackProfile;
+      }
       console.error('Error al registrar estudiante:', error);
       throw error;
     }

@@ -18,352 +18,133 @@
 
 | Capa / Módulo | Tecnología | Justificación Técnica y Pedagógica |
 | :--- | :--- | :--- |
-| **Frontend UI / PWA** | **Ionic 8 + Angular 17/18** (Standalone Components) | **Experiencia multiplataforma lista para producción (Web, PWA, iOS y Android con Capacitor)**. Para una institución como *Global Certified English Center*, los estudiantes acceden desde tablets, teléfonos móviles o laptops. Ionic ofrece componentes táctiles optimizados para niños (botones grandes, retroalimentación táctil, animaciones fluidas). Angular Standalone ofrece arquitectura modular moderna, tipado estricto con TypeScript, lazy loading nativo y compilación ultrarrápida con `esbuild`/`Vite`. |
+| **Frontend UI / PWA** | **Ionic 8 + Angular 17/18** (Standalone Components) | **Experiencia multiplataforma lista para producción (Web, PWA, iOS y Android con Capacitor)**. Para una institución como *Global Certified English Center*, los estudiantes acceden desde tablets, teléfonos móviles o laptops. Ionic ofrece componentes táctiles optimizados para niños (botones grandes, retroalimentación táctil, animaciones fluidas). Angular Standalone ofrece arquitectura modular moderna, tipado estricto con TypeScript, lazy loading nativo y compilación ultrarrápida con esbuild y Vite. |
 | **Speech Engine** | **Web Speech API** (`SpeechRecognition` + `SpeechSynthesis`) | Permite evaluar la pronunciación en Speaking y reproducir transmisiones de listening en inglés y tips de Cosmo en español **directamente en el navegador del alumno**, con latencia cero y sin requerir dependencias externas pesadas ni costes de API por llamada durante el prototipo. |
 | **Autenticación** | **Firebase Authentication** | Soporte integrado para **Google Sign-In**, correo/contraseña y sesiones anónimas. Permite emitir tokens JWT criptográficamente seguros y gestionar identidades sin infraestructura de servidores dedicados. |
 | **Persistencia Reactiva** | **Firebase Realtime Database (RTDB) / Cloud Firestore** | Sincronización bidireccional reactiva por WebSockets. Permite que las calificaciones, intentos y expedientes de los estudiantes se actualicen instantáneamente en el dashboard del alumno y en la vista del profesor. |
 | **Cómputo Serverless** | **Firebase Cloud Functions (Node.js)** | Ejecución aislada de la lógica de negocio y evaluación de exámenes en backend, eliminando cualquier posibilidad de que el alumno vea o manipule la clave de respuestas. |
-| **CI/CD & Hosting** | **GitHub Actions + GitHub Pages** | Pipeline automatizado de integración continua que compila con optimizaciones de producción (`--base-href /MiniglobalAI/`) y despliega al Edge CDN global con alta disponibilidad y soporte de enrutamiento SPA (`withHashLocation` + `404.html`). |
+| **CI/CD & Hosting** | **GitHub Actions + GitHub Pages** | Pipeline automatizado de integración continua que compila con optimizaciones de producción y despliega al Edge CDN global con alta disponibilidad y soporte de enrutamiento SPA mediante HashLocation y página de redirección 404. |
 
 ---
 
 ### 2. Arquitectura Propuesta
 
-Se propone una **Arquitectura Serverless Orientada a Eventos con Enfoque Zero-Trust en el Cliente**:
+Se propone una **Arquitectura Serverless Orientada a Eventos con Enfoque Zero-Trust en el Cliente**, estructurada en cinco capas principales:
 
-```mermaid
-flowchart TD
-    subgraph ClientLayer["Capa de Cliente (Multiplataforma)"]
-        Browser["PWA / Web Browser"]
-        Tablet["Tablet / iPad (Capacitor)"]
-        Mobile["Smartphone Android/iOS"]
-    end
-
-    subgraph CDNLayer["Edge & Distribución Global"]
-        GH["GitHub Pages CDN / Firebase Hosting"]
-    end
-
-    subgraph AuthLayer["Seguridad e Identidad"]
-        FBAuth["Firebase Auth (OAuth Google + JWT Custom Claims)"]
-    end
-
-    subgraph ComputeLayer["Backend Serverless & API Gateway"]
-        CFEval["Cloud Function: evaluateAssessment()"]
-        CFAI["AI Gateway: Multi-LLM / Speech Evaluator"]
-    end
-
-    subgraph StorageLayer["Persistencia y Caché"]
-        RTDBPublic["RTDB: /questions_public (Solo Lectura)"]
-        RTDBPrivate["RTDB: /questions_answer_key (Restringido Backend)"]
-        RTDBUsers["RTDB: /users/$uid & /attempts/$uid"]
-        RedisCache["Cloud Memorystore (Redis): Semantic & Token Cache"]
-    end
-
-    ClientLayer -->|Carga de Assets Estáticos| CDNLayer
-    ClientLayer -->|Autenticación| FBAuth
-    ClientLayer -->|Lee preguntas públicas| RTDBPublic
-    ClientLayer -->|Envía respuestas del alumno| CFEval
-    CFEval -->|Verifica respuestas privadas| RTDBPrivate
-    CFEval -->|Análisis fonético y feedback| CFAI
-    CFEval -->|Persiste nota calculada| RTDBUsers
-    CFAI -.->|Caché de prompts| RedisCache
-```
-
-- **Separación estricta de responsabilidades**: La aplicación cliente es un reproductor inteligente de evaluación y captura de voz; el backend serverless es la única entidad autorizada para calificar y certificar notas.
-- **Tolerancia a desconexiones (Offline-First)**: Si el estudiante pierde conexión durante una prueba escolar, el estado se guarda en `localStorage`/`sessionStorage` y se sincroniza en cuanto vuelve el enlace.
+* **Capa de Cliente Multiplataforma**: La aplicación se ejecuta como Single Page Application (SPA) y Progressive Web App (PWA) empaquetable en Android e iOS. Implementa componentes autónomos de Angular y servicios desacoplados para la lógica de autenticación, voz y evaluación. Cuenta con resiliencia offline que guarda los progresos localmente si el estudiante pierde la conexión en el aula.
+* **Capa de Distribución Perimetral (Edge CDN)**: Los activos estáticos de la aplicación se distribuyen a través de una red de entrega de contenido (CDN) global con compresión avanzada y tiempos de respuesta inferiores a un segundo.
+* **Capa de Seguridad e Identidad**: Gestionada mediante Firebase Authentication, emitiendo credenciales criptográficas seguras (JWT) tanto para cuentas institucionales de Google Workspace como para usuarios con correo y contraseña.
+* **Capa de Cómputo Serverless (Backend Evaluador)**: Microservicios en Cloud Functions aislados del cliente. El navegador envía exclusivamente las elecciones del alumno; la función recupera la clave de respuestas privada, ejecuta la calificación y almacena el resultado oficial.
+* **Capa de Persistencia y Caché**: Almacenamiento reactivo estructurado en Realtime Database y Cloud Firestore, complementado con una capa de memoria caché para acelerar consultas frecuentes y metadatos curriculares.
 
 ---
 
 ### 3. Modelo de Datos
 
-Estructura de datos NoSQL normalizada y diseñada para consultas directas y reglas de seguridad granulares:
+Estructura de datos NoSQL organizada en entidades modulares:
 
-```json
-{
-  "users": {
-    "$uid": {
-      "uid": "string",
-      "displayName": "Lucas Estrella",
-      "email": "lucas@example.com",
-      "role": "student | teacher | admin",
-      "avatarIcon": "🧑‍🚀",
-      "cadetTitle": "Piloto de Exploración",
-      "xpPoints": 450,
-      "streakDays": 5,
-      "classId": "class_a2_morning",
-      "createdAt": "2026-03-24T10:00:00Z",
-      "lastActive": "2026-03-24T15:30:00Z"
-    }
-  },
-  "questions_public": [
-    {
-      "id": 1,
-      "type": "multiple-choice | fill-blank | reading | listening | speaking",
-      "skill": "grammar | vocabulary | reading | listening | speaking",
-      "prompt": "Cosmo is preparing for his next space flight. Choose the correct verb form:",
-      "context": "\"Cosmo ___ to the Red Planet tomorrow.\"",
-      "options": ["is travelling", "travelled", "travels yesterday", "travelling"],
-      "cosmoTip": "¡Fíjate en la palabra \"tomorrow\", nos habla del futuro cercano! 🚀"
-    }
-  ],
-  "questions_answer_key": {
-    "1": {
-      "correctAnswer": "is travelling",
-      "alternativeAnswers": ["is traveling"],
-      "weight": 10
-    },
-    "5": {
-      "targetPhonetic": "aɪ wɑnt tu bi ən ˈæstrəˌnɔt",
-      "correctAnswer": "I want to be an astronaut",
-      "minSimilarity": 0.80
-    }
-  },
-  "attempts": {
-    "$uid": {
-      "$attemptId": {
-        "id": "att_1711296000",
-        "uid": "$uid",
-        "studentName": "Lucas Estrella",
-        "score": 90,
-        "skills": {
-          "grammar": 100,
-          "vocabulary": 100,
-          "reading": 100,
-          "listening": 100,
-          "speaking": 50
-        },
-        "level": "A2 Star Explorer",
-        "completedAt": "2026-03-24T15:35:00Z",
-        "feedback": {
-          "displayMessage": "¡Excelente vuelo cósmico!",
-          "spokenFeedback": "¡Fantástico trabajo, Lucas!",
-          "mood": "celebration",
-          "focusSkill": "speaking"
-        }
-      }
-    }
-  }
-}
-```
+* **users (Expediente de Usuario)**: Almacena la identidad del estudiante o profesor. Contiene el identificador único (UID), nombre visible, correo electrónico, rol institucional (estudiante, profesor o administrador), avatar cósmico seleccionado, rango o título de cadete, puntos de experiencia acumulados (XP), racha de días consecutivos, identificador de aula asignada, fecha de registro y última conexión.
+* **questions_public (Banco de Preguntas Público)**: Colección de desafíos visible para los estudiantes durante la prueba. Cada elemento incluye el identificador de la pregunta, tipo de interacción (opción múltiple, completar espacios, lectura, audio o voz), habilidad evaluada (Grammar, Vocabulary, Reading, Listening o Speaking), enunciado en inglés, contexto de lectura o escucha, opciones de respuesta mezcladas y consejo pedagógico de Cosmo. **No contiene en ningún caso la respuesta correcta.**
+* **questions_answer_key (Clave Maestra Privada)**: Almacén protegido de soluciones custodiado en el servidor. Incluye el identificador de pregunta, respuesta correcta oficial, variantes ortográficas o sinónimos aceptados, transcripción fonética objetivo para preguntas de speaking, nivel de tolerancia fonética y ponderación de puntuación.
+* **attempts (Historial de Evaluaciones e Intentos)**: Registro inmutable de cada prueba completada. Cada intento incluye su identificador único, referencia al alumno, fecha y hora exacta, puntuación global porcentual (de 0 a 100), desglose de aciertos por habilidad lingüística, nivel de competencia alcanzado (A2 Star Explorer) y la retroalimentación cualitativa generada por Cosmo.
 
 ---
 
 ### 4. Cómo Protegería las Respuestas Correctas
 
-Para garantizar la integridad académica requerida por **Global Certified English Center**, se aplica el **Principio de Confianza Cero en el Cliente (Zero-Trust Client Security)**:
+Para garantizar la máxima integridad académica para **Global Certified English Center**, se aplica el principio de **Confianza Cero en el Cliente (Zero-Trust Security)**:
 
-1. **Respuestas Ocultas del Bundle**: En el frontend (`questions_public`), las preguntas **nunca** incluyen la propiedad `correctAnswer`. Ninguna inspección de código (`Ctrl+U`), consola de desarrollador ni pestaña de red (`Network`) puede revelar las respuestas.
-2. **Evaluación 100% en Backend Serverless**:
-   - El cliente solo envía el mapa de selecciones del alumno: `{ "1": "is travelling", "2": "Spacesuit", ... }`.
-   - La Cloud Function recupera la clave de respuestas desde `/questions_answer_key` (protegida con la regla `".read": false, ".write": false`).
-   - El backend compara las cadenas normalizadas (sin mayúsculas, tildes ni signos) y valida el nivel de similitud fonética en las preguntas de speaking.
-3. **Reglas de Seguridad Estrictas en Base de Datos**:
-   ```json
-   {
-     "rules": {
-       "questions_public": {
-         ".read": "auth != null",
-         ".write": "auth.token.role === 'admin'"
-       },
-       "questions_answer_key": {
-         ".read": false,
-         ".write": false
-       },
-       "attempts": {
-         "$uid": {
-           ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'teacher' || auth.token.role === 'admin')",
-           ".write": false
-         }
-       }
-     }
-   }
-   ```
-   *(Nota: `attempts` tiene `.write: false` para el cliente; únicamente el SDK de Admin en la Cloud Function puede escribir el registro oficial del examen).*
-4. **Protección Anti-Fuerza Bruta y Timeouts**:
-   - Cada intento tiene un `attemptToken` emitido al iniciar la prueba con expiración de 20 minutos.
-   - Limitación de frecuencia (Rate Limiting): Máximo 3 intentos por estudiante cada 24 horas para evitar adivinanza por repetición.
-   - Orden aleatorio de preguntas (Fisher-Yates) para desincentivar la copia entre compañeros en una misma aula.
+* **Ocultamiento Total en el Cliente**: La clave de respuestas jamás se incluye en el código fuente, en los paquetes de JavaScript compilados, ni en las variables de almacenamiento local o de sesión del navegador. El estudiante solo tiene acceso visual a las preguntas públicas.
+* **Calificación Exclusivamente en Servidor**: El dispositivo del alumno solo transmite un mapa con sus elecciones (por ejemplo, pregunta 1: opción seleccionada). El servidor recupera la clave privada de respuestas, realiza la comparación normalizada (omitiendo mayúsculas, tildes y signos de puntuación) y asigna el puntaje de manera neutral.
+* **Reglas de Seguridad Inmutables en Base de Datos**: Las políticas de acceso establecen que el catálogo privado de soluciones tiene denegada toda lectura y escritura para clientes. De igual manera, el nodo de intentos históricos tiene la escritura deshabilitada para usuarios normales, siendo únicamente editable por el backend autenticado con privilegios administrativos.
+* **Mecanismos Anti-Fraude**:
+  * **Sesiones con Expiración**: Cada evaluación cuenta con un token de sesión temporal con un límite de tiempo razonable para evitar pausas no supervisadas.
+  * **Limitación de Frecuencia (Rate Limiting)**: Se restringe el número máximo de intentos permitidos por estudiante en un intervalo de 24 horas para evitar adivinanza por fuerza bruta.
+  * **Orden Aleatorio de Preguntas**: Implementación del algoritmo Fisher-Yates para barajar las preguntas al iniciar la prueba, impidiendo que dos estudiantes contiguos resuelvan las preguntas en el mismo orden.
 
 ---
 
 ### 5. Cómo Escalaría de 100 a 50.000 o 100.000 Estudiantes
 
-Para escalar a 100.000 alumnos concurrentes en periodos de exámenes institucionales:
+Estrategia de escalabilidad horizontal para soportar picos masivos de uso durante semanas de exámenes institucionales:
 
-1. **Frontend y Assets en el Edge (CDN Global)**:
-   - Los archivos estáticos (JS, CSS, audio, iconos de avatares) se distribuyen vía CDN global (Cloudflare / Fastly / Firebase Hosting) con compresión Brotli y almacenamiento en caché perimetral, reduciendo el 95% del tráfico a los servidores centrales.
-2. **Migración a Cloud Firestore con Sharding**:
-   - Realtime Database es excelente para prototipos, pero para 100.000 estudiantes concurrentes se migra a **Cloud Firestore**, que escala automáticamente de manera horizontal con particionamiento de colecciones (`sharding`).
-   - Consultas indexadas por institución y aula: `/centers/{centerId}/classes/{classId}/students`.
-3. **Capa Serverless con Autoescalado (Google Cloud Run / Cloud Functions 2nd Gen)**:
-   - Basado en Google Cloud Run (contenedores autoescalables) con concurrencia de hasta 1.000 solicitudes por contenedor y escalado de 0 a miles de instancias en milisegundos.
-4. **Desacoplamiento con Colas Asíncronas (Pub/Sub + Cloud Tasks)**:
-   - El endpoint de entrega del examen responde inmediatamente al estudiante con su calificación preliminar.
-   - Tareas pesadas (análisis fonético por IA, generación de reportes en PDF y envío de correos a padres) se encolan en **Google Cloud Pub/Sub** y se procesan asíncronamente con workers en segundo plano.
-5. **Caché Semántica en Memoria (Redis / Cloud Memorystore)**:
-   - Almacenamiento en caché de configuraciones institucionales y preguntas frecuentes para evitar lecturas recurrentes a la base de datos.
+* **Distribución de Contenido Estático en el Edge**: Todo el código de la interfaz, estilos, archivos de audio y recursos gráficos se distribuyen a través de redes CDN globales con almacenamiento en caché perimetral, descargando la infraestructura central en más de un 95%.
+* **Migración a Cloud Firestore con Particionamiento (Sharding)**: Para cargas de 100.000 alumnos concurrentes se emplea Cloud Firestore con particionamiento horizontal automático por centros de enseñanza, niveles y aulas escolares, garantizando lecturas y escrituras atómicas sin cuellos de botella.
+* **Cómputo Serverless Autoescalable**: La lógica de evaluación y servicios backend se ejecutan sobre Google Cloud Run y Cloud Functions de segunda generación, capaces de escalar automáticamente desde cero hasta miles de contenedores simultáneos en pocos segundos.
+* **Desacoplamiento con Colas Asíncronas**: El estudiante recibe su nota preliminar de forma instantánea; las operaciones con mayor consumo de cómputo (evaluación fonética avanzada, generación de certificados en formato PDF y envío de reportes a padres) se delegan a sistemas de mensajería como Google Cloud Pub/Sub y Cloud Tasks para procesamiento diferido sin bloquear la experiencia del usuario.
+* **Caché en Memoria**: Implementación de Redis para almacenar en memoria las configuraciones académicas y preguntas frecuentes, evitando lecturas reiterativas a la base de datos principal.
 
 ---
 
 ### 6. Cómo Manejaría Roles de Estudiante, Profesor y Administrador
 
-Implementación de **RBAC (Role-Based Access Control)** mediante **Firebase Custom Claims** firmados criptográficamente en el token JWT:
+Implementación de un sistema de **Control de Acceso Basado en Roles (RBAC)** respaldado por notaciones criptográficas en el token de autenticación (Custom Claims):
 
-```mermaid
-graph TD
-    User([Usuario Inicia Sesión]) --> Token{Token JWT con Custom Claim}
-    Token -->|role == 'student'| StudentPortal[Portal Estudiante: Evaluaciones, bitácora y perfil propio]
-    Token -->|role == 'teacher'| TeacherPortal[Portal Profesor: Métricas de grupo, historial del aula, exportación de notas]
-    Token -->|role == 'admin'| AdminPortal[Portal Administrador: Gestión de profesores, banco de preguntas y auditoría]
-```
-
-1. **Custom Claims en el Token JWT**:
-   ```javascript
-   // Asignación administrativa en Cloud Function
-   await admin.auth().setCustomUserClaims(uid, {
-     role: 'teacher',
-     centerId: 'global_certified_center',
-     classes: ['a2_kids_morning', 'a2_kids_afternoon']
-   });
-   ```
-2. **Seguridad en Backend y Base de Datos**:
-   - Las reglas de seguridad de Firestore/RTDB inspeccionan directamente `request.auth.token.role`.
-   - Los profesores solo pueden leer los datos de los estudiantes que pertenezcan a sus clases asignadas (`resource.data.classId in request.auth.token.classes`).
-   - Los administradores tienen acceso global de lectura/escritura y control de auditoría.
-3. **Rutas y Guardias en Angular (`canActivate`)**:
-   - `RoleGuard`: Redirige al estudiante al `/dashboard`, al docente a `/teacher/overview` y al director a `/admin/console`.
+* **Atribución Segura de Roles**: Los permisos no dependen de campos manipulables en el navegador, sino de atributos sellados criptográficamente en el token JWT del usuario, asignados únicamente por procesos autorizados en el servidor.
+* **Privilegios por Perfil**:
+  * **Estudiante**: Acceso exclusivo a rendir evaluaciones, consultar su propia bitácora de resultados, revisar sus medallas y personalizar su avatar.
+  * **Profesor**: Vista de consola docente para monitorear el desempeño de sus grupos asignados, visualizar fortalezas y debilidades del aula, registrar observaciones pedagógicas y exportar sábanas de calificaciones.
+  * **Administrador**: Gestión integral de la sede académica, creación y asignación de profesores, configuración del banco curricular de preguntas, parametrización de umbrales de aprobación y auditoría de seguridad.
+* **Control de Navegación y Reglas de Base de Datos**: Guardianes de ruta en Angular que dirigen a cada usuario a su portal correspondiente, respaldados por reglas en la base de datos que validan el rol institucional antes de autorizar cualquier lectura o escritura.
 
 ---
 
 ### 7. Cómo Integraría IA sin Acoplar toda la Plataforma a un Único Proveedor
 
-Para evitar el *Vendor Lock-In* (dependencia exclusiva de OpenAI, Google o Anthropic), se aplica el patrón de diseño **Adapter / Provider-Agnostic AI Gateway**:
+Para proteger a la institución del riesgo de dependencia exclusiva de un proveedor tecnológico (Vendor Lock-In), se adopta el **Patrón de Arquitectura Adaptador (Agnostic AI Gateway)**:
 
-```mermaid
-classDiagram
-    class IAIEngine {
-        <<interface>>
-        +evaluateSpeaking(audio: Buffer, targetText: string): Promise~SpeakingEvaluation~
-        +generateCosmoFeedback(metrics: AttemptMetrics): Promise~CosmoFeedback~
-    }
-
-    class GoogleGeminiAdapter {
-        +evaluateSpeaking()
-        +generateCosmoFeedback()
-    }
-
-    class OpenAIWhisperAdapter {
-        +evaluateSpeaking()
-        +generateCosmoFeedback()
-    }
-
-    class AnthropicClaudeAdapter {
-        +evaluateSpeaking()
-        +generateCosmoFeedback()
-    }
-
-    class LocalOllamaAdapter {
-        +evaluateSpeaking()
-        +generateCosmoFeedback()
-    }
-
-    class AIGateway {
-        -primaryProvider: IAIEngine
-        -fallbackProvider: IAIEngine
-        +executeWithCircuitBreaker()
-    }
-
-    IAIEngine <|.. GoogleGeminiAdapter
-    IAIEngine <|.. OpenAIWhisperAdapter
-    IAIEngine <|.. AnthropicClaudeAdapter
-    IAIEngine <|.. LocalOllamaAdapter
-    AIGateway o-- IAIEngine
-```
-
-- **Patrón Adapter**: La lógica de negocio solo interactúa con la interfaz `IAIEngine`. Ningún componente de Angular ni Cloud Function llama directamente al SDK propietario de un proveedor.
-- **Circuit Breaker y Conmutación por Fallo (Failover Automático)**:
-  - Si el proveedor primario (ej. Gemini Flash) supera un timeout de 2.500 ms o devuelve error `429 Too Many Requests`, el Gateway conmuta automáticamente y sin errores al proveedor secundario (ej. OpenAI GPT-4o mini / Claude 3.5 Haiku).
-- **Opción On-Premise / Servidor Propio**:
-  - Posibilidad de utilizar modelos de código abierto (Llama 3 + Whisper) alojados en infraestructura local o servidores propios mediante `LocalOllamaAdapter`, garantizando soberanía de datos y coste predecible.
-- **Caché Semántica**: Evita realizar consultas de inferencia repetidas para respuestas comunes de los niños, reduciendo costes en un 70%.
+* **Interfaz Agnóstica Común**: Se define un contrato genérico de evaluación de voz y generación de retroalimentación pedagógica independiente de cualquier empresa comercial. Los componentes de la plataforma únicamente dialogan con esta interfaz abstracta.
+* **Adaptadores Intercambiables**:
+  * Conector para **Google Gemini** optimizado para respuestas rápidas y análisis multimodal.
+  * Conector para **OpenAI** con modelos especializados en transcripción fonética (Whisper) y lenguaje natural.
+  * Conector para **Anthropic Claude** enfocado en retroalimentación formativa y redacción pedagógica adaptada a niños.
+  * Conector para **Modelos Locales de Código Abierto (Ollama / Llama 3 / Whisper Local)**, permitiendo desplegar la inferencia en servidores institucionales propios para garantizar la privacidad y soberanía total de datos de los menores.
+* **Disyuntor y Tolerancia a Fallos (Circuit Breaker & Failover)**: Si el servicio de inteligencia artificial primario presenta lentitud superior a tres segundos o alcanza límites de cuota, el pasarela conmuta automáticamente al proveedor de respaldo de forma transparente para el estudiante.
+* **Caché Semántica**: Registro de respuestas y explicaciones didácticas estándar para evitar consultas redundantes a los modelos de lenguaje, reduciendo drásticamente los costes operativos.
 
 ---
 
 ### 8. Qué Cambiaría si Tuviera Tres Meses para Convertir el Prototipo en Producto
 
-Plan de desarrollo estratégico de 90 días para convertir el prototipo actual en un producto de nivel empresarial para **Global Certified English Center**:
+Plan estratégico de desarrollo en 90 días para transformar la solución en un producto insignia de **Global Certified English Center**:
 
-```mermaid
-gantt
-    title Plan de Evolución del Producto (90 Días)
-    dateFormat  YYYY-MM-DD
-    section Mes 1: Robustez & Backend
-    Arquitectura Cloud Functions + Gateway IA       :m1_1, 2026-10-01, 14d
-    SSO Institucional Google Workspace / MS 365     :m1_2, after m1_1, 10d
-    Módulo RBAC (Student, Teacher, Admin)           :m1_3, after m1_2, 7d
-    section Mes 2: Pedagogía & CAT
-    CMS de Preguntas y Habilidades CEFR (A1-B2)     :m2_1, 2026-11-01, 12d
-    Test Adaptativo por Computadora (CAT)           :m2_2, after m2_1, 10d
-    Certificados Digitales Oficiales con QR         :m2_3, after m2_2, 8d
-    section Mes 3: Móvil, IA & Auditoría
-    App Nativa iOS & Android (Capacitor)           :m3_1, 2026-12-01, 14d
-    Dashboard Predictivo & Reportes WhatsApp/Email :m3_2, after m3_1, 10d
-    Auditoría COPPA / GDPR-K & Pruebas de Carga 100k:m3_3, after m3_2, 7d
-```
-
-#### Mes 1: Infraestructura Empresarial, Seguridad y Motor de IA
-- Migrar la persistencia a **Cloud Firestore** con particionamiento institucional.
-- Implementar la evaluación serverless mediante **Cloud Functions** con el **Agnostic AI Gateway** para evaluación fonética real de Speaking (análisis de pronunciación, ritmo y fluidez con Whisper / Gemini).
-- Integración de inicio de sesión único institucional (**SSO con Google Workspace for Education y Microsoft 365**).
-- Implementación de roles (Estudiante, Profesor, Administrador) y paneles de control para profesores.
-
-#### Mes 2: Pedagogía Adaptativa, CMS y Certificación Oficial
-- **CMS de Gestión Curricular**: Herramienta visual para que los directores académicos del *Global Certified English Center* puedan crear, categorizar y actualizar preguntas alineadas al marco CEFR (A1, A2, B1, B2).
-- **Test Adaptativo por Computadora (CAT)**: El algoritmo ajusta la dificultad de las preguntas en tiempo real según el desempeño del estudiante, permitiendo diagnósticos de nivel de alta precisión en menos tiempo.
-- **Generación Automática de Diplomas Oficiales**: Certificados en PDF con código QR y hash de verificación para certificar el nivel del alumno ante los padres de familia.
-
-#### Mes 3: App Nativa, Analíticas Predictivas y Lanzamiento
-- Empaquetado nativo con **Capacitor** para publicación oficial en **Google Play Store y Apple App Store**, habilitando modo offline escolar completo.
-- **Analíticas Predictivas para Docentes**: Detección automatizada de estudiantes rezagados en habilidades específicas (ej. dificultades con verbos irregulares o discriminación auditiva) con sugerencia de actividades de refuerzo.
-- **Envío Automatizado de Reportes de Progreso** a los tutores y padres de familia vía WhatsApp Business API y correo institucional.
-- **Auditoría de Cumplimiento Normativo de Privacidad Infantil (COPPA / GDPR-K)** y pruebas de carga con herramientas como k6 para certificar rendimiento ante 100.000 usuarios concurrentes.
+* **Mes 1: Robustez, Infraestructura Empresarial y Evaluación Fonética con IA**:
+  * Migración definitiva de la persistencia a Cloud Firestore con particionamiento institucional.
+  * Despliegue del motor evaluador serverless con análisis fonético real de Speaking, evaluando pronunciación, entonación y fluidez.
+  * Integración de inicio de sesión único institucional (SSO) con Google Workspace for Education y Microsoft 365.
+  * Activación del módulo de roles y permisos con paneles especializados para docentes.
+* **Mes 2: Pedagogía Adaptativa, Gestión Curricular y Certificados**:
+  * Módulo administrativo de gestión curricular (CMS) para que los coordinadores académicos diseñen, editen y publiquen reactivos clasificados por competencias del marco MCER (niveles A1 a B2).
+  * Implementación de Test Adaptativo por Computadora (CAT), donde la dificultad de las preguntas evoluciona en tiempo real según el rendimiento demostrado por el alumno.
+  * Emisión automática de diplomas de certificación con código QR y sello criptográfico de verificación institucional.
+* **Mes 3: Publicación Móvil Nativa, Analíticas Predictivas y Lanzamiento**:
+  * Empaquetado y publicación oficial como aplicación móvil nativa en Google Play Store y Apple App Store con soporte para trabajo desconectado en laboratorios escolares.
+  * Panel de analíticas predictivas para docentes que detecte tempranamente vacíos de aprendizaje en habilidades específicas.
+  * Notificaciones automáticas de progreso a representantes y padres de familia a través de mensajería instantánea y correo electrónico.
+  * Auditoría de cumplimiento de estándares internacionales de privacidad infantil (COPPA y GDPR-K) y pruebas de estrés para certificar alta concurrencia con 100.000 estudiantes simultáneos.
 
 ---
 
 ## 🛠️ Instalación y Ejecución Local
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Katthon/MiniglobalAI.git
-cd MiniglobalAI
+Para ejecutar el proyecto en un entorno de desarrollo local:
 
-# 2. Instalar dependencias
-npm install
-
-# 3. Iniciar servidor de desarrollo
-npm start
-# o
-npx ng serve
-```
-
-Navega a `http://localhost:4200/`.
+1. Clonar el repositorio desde GitHub mediante la URL oficial del proyecto.
+2. Instalar las dependencias del proyecto ejecutando el comando de instalación de paquetes `npm install`.
+3. Iniciar el servidor de desarrollo local ejecutando `npm start` o `npx ng serve`.
+4. Abrir el navegador en la dirección local por defecto `http://localhost:4200/`.
 
 ---
 
 ## 🌐 Despliegue en GitHub Pages
 
-El proyecto cuenta con integración continua automatizada con **GitHub Actions** (`.github/workflows/deploy.yml`). Cada `push` a la rama `main` compila y publica automáticamente en:
+El proyecto cuenta con integración continua automatizada con **GitHub Actions**. Cada cambio integrado a la rama principal compila la aplicación con optimización de producción y publica la versión más reciente en:
 
-🔗 **`https://katthon.github.io/MiniglobalAI/`**
+**Sitio Oficial en Vivo**: https://katthon.github.io/MiniglobalAI/
 
-Para compilar o desplegar manualmente:
-```bash
-# Compilar para producción con base-href de GitHub Pages
-npm run build:gh-pages
-
-# Desplegar directamente a la rama gh-pages
-npm run deploy:gh-pages
-```
+Para compilar manualmente la versión de distribución:
+* Compilación para producción con subdirectorio institucional: `npm run build:gh-pages`
+* Despliegue directo a la rama de publicación: `npm run deploy:gh-pages`
 
 ---
 

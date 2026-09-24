@@ -124,6 +124,17 @@
           </ion-button>
         </div>
 
+        <!-- Acceso directo libre / Cadete Invitado -->
+        <div class="guest-action-container">
+          <button 
+            type="button" 
+            class="guest-btn" 
+            [disabled]="isAuthenticating"
+            (click)="enterAsDemoCadet()">
+            🚀 Ingresar como Cadete Explorador (Modo Libre)
+          </button>
+        </div>
+
         <div class="specs-chips">
           <span class="chip">🔒 Google Auth</span>
           <span class="chip">📧 Correo & Clave</span>
