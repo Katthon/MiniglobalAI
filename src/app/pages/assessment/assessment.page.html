@@ -1,0 +1,224 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goToDashboard()" title="Volver al Dashboard">
+        🏠
+      </ion-button>
+      <ion-button (click)="prevQuestion()" [disabled]="currentIndex === 0 || isLoadingQuestions">
+        ◀ Atrás
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      Misión: Pregunta {{ currentIndex + 1 }} de {{ questions.length }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-badge color="warning" class="cadet-badge">
+        {{ studentName }} 🚀
+      </ion-badge>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra de progreso estelar -->
+  <ion-progress-bar [value]="progressValue" color="tertiary" class="custom-progress"></ion-progress-bar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="assessment-content">
+  <div class="stars-bg"></div>
+
+  <!-- Estado de carga mientras se conecta a questions_public de RTDB -->
+  <div class="loading-state ion-padding ion-text-center" *ngIf="isLoadingQuestions">
+    <app-cosmo-avatar size="medium" mood="happy" message="Descargando mapas de vuelo desde la base espacial..."></app-cosmo-avatar>
+    <ion-spinner name="crescent" color="light" class="big-spinner"></ion-spinner>
+    <p class="loading-text">Cargando preguntas de la galaxia...</p>
+  </div>
+
+  <div class="assessment-container ion-padding" *ngIf="!isLoadingQuestions && currentQuestion">
+    <!-- Cosmo acompañando la pregunta con su tip educativo -->
+    <div class="cosmo-section">
+      <app-cosmo-avatar 
+        size="small" 
+        mood="talking"
+        [message]="currentQuestion.cosmoTip">
+      </app-cosmo-avatar>
+      <div class="cosmo-tip-action">
+        <button 
+          type="button" 
+          class="cosmo-speak-btn" 
+          [class.speaking]="isSpeakingCosmoTip"
+          (click)="playCosmoTip()"
+          title="Escuchar consejo de Cosmo">
+          <span>{{ isSpeakingCosmoTip ? '⏸️ Pausar Cosmo' : '🔊 Escuchar a Cosmo' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tarjeta Principal de la Pregunta -->
+    <ion-card class="question-card">
+      <ion-card-content>
+        <!-- Encabezado de la Habilidad -->
+        <div class="skill-header">
+          <span class="skill-tag" [ngClass]="'skill-' + currentQuestion.skill">
+            {{ currentQuestion.skill | uppercase }}
+          </span>
+          <span class="type-indicator">Pregunta #{{ currentQuestion.id }}</span>
+        </div>
+
+        <!-- Instrucción principal -->
+        <h2 class="question-prompt">{{ currentQuestion.prompt }}</h2>
+
+        <!-- SECCIÓN DE AUDIO PARA HABILIDAD 'LISTENING' -->
+        <div *ngIf="currentQuestion.skill === 'listening'" class="listening-card">
+          <div class="listening-header">
+            <span class="listening-badge">📻 Transmisión de Audio Espacial</span>
+            <span class="frequency-indicator">📡 Señal Activa</span>
+          </div>
+
+          <div class="listening-player">
+            <button 
+              type="button"
+              class="listen-audio-btn" 
+              [class.playing]="isSpeakingListening"
+              (click)="playListeningAudio()">
+              <span class="audio-icon">{{ isSpeakingListening ? '⏸️' : '🔊' }}</span>
+              <span class="audio-label">
+                {{ isSpeakingListening ? 'Pausar Transmisión' : 'Escuchar Audio en Inglés' }}
+              </span>
+            </button>
+            <p class="listen-instruction">
+              🎧 Presiona el botón para escuchar la transmisión en inglés de la base espacial las veces que necesites.
+            </p>
+
+            <!-- Animación de ondas de sonido -->
+            <div class="sound-wave listening-wave" *ngIf="isSpeakingListening">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- Texto de apoyo de la transmisión -->
+          <div class="transmission-transcription" *ngIf="currentQuestion.context">
+            <span class="transcription-label">Transmisión de Radio recibida:</span>
+            <p class="transcription-text">{{ currentQuestion.context }}</p>
+          </div>
+        </div>
+
+        <!-- Contexto o Pasaje para otras habilidades (Reading / Grammar) -->
+        <div class="question-context" *ngIf="currentQuestion.context && currentQuestion.skill !== 'listening'">
+          <p>{{ currentQuestion.context }}</p>
+        </div>
+
+        <!-- TIPO 1: OPCIÓN MÚLTIPLE / LECTURA / VOCABULARIO -->
+        <div *ngIf="currentQuestion.options && currentQuestion.type !== 'speaking'" class="options-grid">
+          <button 
+            *ngFor="let opt of currentQuestion.options"
+            type="button"
+            class="option-btn"
+            [class.selected]="isOptionSelected(opt)"
+            (click)="selectOption(opt)">
+            <span class="opt-bullet">⭐</span>
+            <span class="opt-text">{{ opt }}</span>
+          </button>
+        </div>
+
+        <!-- TIPO 2: COMPLETAR ESPACIO (Fill in the blank) -->
+        <div *ngIf="currentQuestion.type === 'fill-blank' && !currentQuestion.options" class="fill-blank-container">
+          <label class="fill-label">Escribe la palabra que falta:</label>
+          <input 
+            type="text" 
+            class="fill-input" 
+            [(ngModel)]="answers[currentQuestion.id]" 
+            placeholder="Escribe tu respuesta aquí...">
+        </div>
+
+        <!-- TIPO 3: SPEAKING CON WEB SPEECH API -->
+        <div *ngIf="currentQuestion.type === 'speaking'" class="speaking-container">
+          <div class="speaking-instructions">
+            <p>1. Presiona el micrófono cósmico.</p>
+            <p>2. Di la frase en inglés en voz alta.</p>
+          </div>
+
+          <div class="mic-button-wrapper">
+            <!-- Si el navegador soporta Web Speech Recognition -->
+            <button 
+              *ngIf="speechService.isSpeechSupported()"
+              type="button"
+              class="mic-btn" 
+              [class.recording]="isRecording"
+              (click)="toggleRecording()">
+              <span class="mic-icon">{{ isRecording ? '⏹️' : '🎙️' }}</span>
+              <span class="mic-label">{{ isRecording ? 'Escuchando en inglés...' : 'Presiona para hablar' }}</span>
+            </button>
+
+            <!-- Botón de Simulación para Firefox / Navegadores sin SpeechRecognition -->
+            <button 
+              type="button"
+              class="simulate-btn"
+              (click)="simulateSpeaking(currentQuestion.context || '')">
+              <span>🚀 Decir en voz alta con Cosmo (Simular)</span>
+            </button>
+          </div>
+
+          <!-- Ondas de sonido cuando graba -->
+          <div class="sound-wave" *ngIf="isRecording">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+
+          <!-- Mensaje de aviso o error -->
+          <div *ngIf="speechError" class="speech-error-box">
+            ℹ️ {{ speechError }}
+          </div>
+
+          <!-- Opcional: escribir la frase si no tiene micro -->
+          <div class="manual-speaking-input">
+            <span class="manual-hint">O escribe la frase si tu micrófono no está disponible:</span>
+            <input 
+              type="text" 
+              class="fill-input small" 
+              [(ngModel)]="answers[currentQuestion.id]" 
+              placeholder="Escribe la frase en inglés...">
+          </div>
+
+          <!-- Texto detectado por la Web Speech API -->
+          <div class="transcript-box" *ngIf="answers[currentQuestion.id]">
+            <span class="transcript-title">Cosmo te escuchó decir:</span>
+            <p class="transcript-text">"{{ answers[currentQuestion.id] }}"</p>
+            <button class="retry-voice-btn" (click)="toggleRecording()">
+              🔄 Volver a intentar
+            </button>
+          </div>
+        </div>
+
+        <!-- Navegación inferior dentro de la tarjeta -->
+        <div class="nav-controls">
+          <button 
+            type="button"
+            class="nav-btn prev-btn" 
+            [disabled]="currentIndex === 0" 
+            (click)="prevQuestion()">
+            ◀ Anterior
+          </button>
+
+          <!-- Siguiente pregunta -->
+          <button 
+            *ngIf="currentIndex < questions.length - 1"
+            type="button"
+            class="nav-btn next-btn" 
+            (click)="nextQuestion()">
+            Siguiente ▶
+          </button>
+
+          <!-- Finalizar y enviar a Cloud Function -->
+          <button 
+            *ngIf="currentIndex === questions.length - 1"
+            type="button"
+            class="nav-btn submit-btn" 
+            [disabled]="isSubmitting"
+            (click)="submitAssessment()">
+            <span *ngIf="!isSubmitting">¡Finalizar Misión! 🚀</span>
+            <span *ngIf="isSubmitting">Evaluando en la Base...</span>
+          </button>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

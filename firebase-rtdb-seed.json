@@ -1,0 +1,102 @@
+{
+  "questions_public": [
+    {
+      "id": 1,
+      "type": "multiple-choice",
+      "skill": "grammar",
+      "prompt": "Cosmo is preparing for his next space flight. Choose the correct verb form:",
+      "context": "\"Cosmo ___ to the Red Planet tomorrow.\"",
+      "options": ["is travelling", "travelled", "travels yesterday", "travelling"],
+      "cosmoTip": "¡Fíjate en la palabra \"tomorrow\", nos habla del futuro cercano! 🚀"
+    },
+    {
+      "id": 2,
+      "type": "vocabulary",
+      "skill": "vocabulary",
+      "prompt": "Look at the gear an astronaut wears to walk outside the rocket. What is it?",
+      "options": ["Spacesuit", "Submarine", "Helicopter", "Raincoat"],
+      "cosmoTip": "¡Es el traje blanco especial que me protege de la gravedad cero! 🐱"
+    },
+    {
+      "id": 3,
+      "type": "reading",
+      "skill": "reading",
+      "prompt": "Read Cosmo's log and answer the question:",
+      "context": "\"Captain Cosmo found three glowing blue crystals inside the crater. He carefully put them into his backpack to show the crew.\"",
+      "options": ["In his backpack", "Under his bed", "In the rocket engine", "On Mars soil"],
+      "cosmoTip": "¡Busca dónde guardó Cosmo los cristales azules brillantes! 🔍"
+    },
+    {
+      "id": 4,
+      "type": "multiple-choice",
+      "skill": "listening",
+      "prompt": "Listen to the audio transmission from the control base:",
+      "context": "📻 \"Attention Explorer: Mars has two small moons named Phobos and Deimos.\"",
+      "options": ["Two", "One", "Four", "Zero"],
+      "cosmoTip": "¡Escucha bien el número de lunas marcianas que mencionó la base! 🛰️"
+    },
+    {
+      "id": 5,
+      "type": "speaking",
+      "skill": "speaking",
+      "prompt": "Press the microphone and say this cosmic phrase clearly:",
+      "context": "\"I want to be an astronaut\"",
+      "cosmoTip": "¡Presiona el botón del micrófono y di fuerte tu frase estelar! 🎙️"
+    },
+    {
+      "id": 6,
+      "type": "fill-blank",
+      "skill": "grammar",
+      "prompt": "Complete the sentence with the past simple of \"see\":",
+      "context": "\"Yesterday, Cosmo ___ a shooting star through his telescope.\"",
+      "options": ["saw", "seen", "sees", "seeing"],
+      "cosmoTip": "\"Yesterday\" significa ayer, ¡necesitamos el pasado simple! ⭐"
+    },
+    {
+      "id": 7,
+      "type": "vocabulary",
+      "skill": "vocabulary",
+      "prompt": "Which word means \"a vehicle that travels into outer space\"?",
+      "options": ["Rocket", "Bicycle", "Train", "Sailboat"],
+      "cosmoTip": "¡Tiene propulsores gigantes y fuego al despegar! 🚀"
+    },
+    {
+      "id": 8,
+      "type": "reading",
+      "skill": "reading",
+      "prompt": "Read this extraterrestrial report:",
+      "context": "\"On Planet Zog, the sky is bright green and the fluffy alien rabbits love eating glowing space apples.\"",
+      "options": ["Glowing space apples", "Chocolate cookies", "Fish tacos", "Space rocks"],
+      "cosmoTip": "¿Qué fruta galáctica comen los conejos alienígenas? 🍏"
+    },
+    {
+      "id": 9,
+      "type": "speaking",
+      "skill": "speaking",
+      "prompt": "Activate the communicator and say this English sentence:",
+      "context": "\"The stars are shining today\"",
+      "cosmoTip": "¡Pronuncia cada palabra con claridad como un auténtico capitán espacial! 🌟"
+    },
+    {
+      "id": 10,
+      "type": "multiple-choice",
+      "skill": "grammar",
+      "prompt": "Choose the correct question word for Cosmo's question:",
+      "context": "\"___ did you leave your space helmet?\" — \"In the cockpit.\"",
+      "options": ["Where", "Who", "When", "Why"],
+      "cosmoTip": "La respuesta menciona un lugar (\"In the cockpit\"), ¿qué palabra usamos para lugares? 🪐"
+    }
+  ],
+  "questions_answer_key": {
+    "1": "is travelling",
+    "2": "Spacesuit",
+    "3": "In his backpack",
+    "4": "Two",
+    "5": "I want to be an astronaut",
+    "6": "saw",
+    "7": "Rocket",
+    "8": "Glowing space apples",
+    "9": "The stars are shining today",
+    "10": "Where"
+  }
+}

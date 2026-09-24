@@ -1,0 +1,1201 @@
+.dashboard-content {
+  --background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+  position: relative;
+}
+
+.dashboard-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.profile-header-btn {
+  --background: rgba(255, 255, 255, 0.15);
+  --color: #ffffff;
+  --border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-right: 4px;
+
+  .btn-avatar {
+    font-size: 1.2rem;
+    margin-right: 5px;
+  }
+}
+
+.logout-btn {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ========================================================
+   1. HERO CARD DEL PERFIL DEL CADETE
+======================================================== */
+.profile-hero-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 2px solid #38bdf8;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(56, 189, 248, 0.18);
+  backdrop-filter: blur(12px);
+  margin-bottom: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 35px rgba(56, 189, 248, 0.28);
+  }
+
+  @media (max-width: 520px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+
+  .user-google-photo {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #38bdf8;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+  }
+
+  .default-avatar-badge {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+    border: 4px solid #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  }
+
+  .level-indicator-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: #f59e0b;
+    color: #0f172a;
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 2px solid #0f172a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.profile-details {
+  flex: 1;
+
+  .profile-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 520px) {
+      justify-content: center;
+      gap: 8px;
+    }
+  }
+
+  .welcome-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #38bdf8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .xp-chip {
+    font-size: 0.8rem;
+    font-weight: 800;
+    height: 26px;
+  }
+
+  .welcome-title {
+    color: #ffffff;
+    font-size: 1.55rem;
+    font-weight: 900;
+    margin: 2px 0;
+  }
+
+  .cadet-rank-subtitle {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+  }
+
+  .xp-progress-box {
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+
+    .xp-labels {
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    ion-progress-bar {
+      height: 6px;
+      border-radius: 3px;
+    }
+  }
+
+  .profile-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    @media (max-width: 520px) {
+      justify-content: center;
+    }
+
+    .rank-badge {
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .edit-profile-hint {
+      color: #38bdf8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ========================================================
+   2. BANNER DE RACHA Y DESAFÍO DIARIO
+======================================================== */
+.daily-mission-banner {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 18px;
+  padding: 12px 18px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+
+  @media (max-width: 520px) {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .banner-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+
+    @media (max-width: 520px) {
+      justify-content: center;
+    }
+
+    .streak-icon, .challenge-icon {
+      font-size: 1.8rem;
+    }
+
+    .banner-title {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .banner-val {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+  }
+
+  .banner-divider {
+    width: 1px;
+    height: 36px;
+    background: #334155;
+    margin: 0 15px;
+
+    @media (max-width: 520px) {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================
+   3. RUTA DE APRENDIZAJE GALÁCTICA (CAMINO A B2)
+======================================================== */
+.section-title-wrap {
+  margin-bottom: 16px;
+
+  .section-heading {
+    color: #ffffff;
+    font-size: 1.35rem;
+    font-weight: 900;
+    margin: 0 0 4px 0;
+  }
+
+  .section-sub {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: block;
+  }
+}
+
+.roadmap-trail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 30px;
+}
+
+.roadmap-node {
+  position: relative;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+
+  .node-status-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    background: #1e293b;
+    border: 2px solid #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+  }
+
+  .node-card {
+    flex: 1;
+    background: rgba(30, 41, 59, 0.85);
+    border-radius: 20px;
+    padding: 18px;
+    border: 2px solid #334155;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    margin-bottom: 6px;
+
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .node-tag {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+
+      .node-icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    .node-title {
+      color: #ffffff;
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin: 0 0 6px 0;
+    }
+
+    .node-desc {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin: 0 0 12px 0;
+    }
+  }
+
+  /* ESTADO: Nivel A1 Completado */
+  &.completed {
+    .node-status-icon {
+      background: #064e3b;
+      border-color: #10b981;
+    }
+    .node-card {
+      border-color: #059669;
+      background: rgba(6, 78, 59, 0.35);
+
+      .completed-tag { color: #34d399; }
+      .node-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .node-status-text {
+          color: #a7f3d0;
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  /* ESTADO: Nivel A2 Misión Activa */
+  &.active-mission {
+    .node-status-icon {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      border-color: #fdba74;
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+      animation: pulseAura 2.5s infinite;
+    }
+
+    .node-card.active-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(20, 28, 48, 0.95) 100%);
+      border: 2px solid #f97316;
+      box-shadow: 0 8px 30px rgba(249, 115, 22, 0.3);
+
+      .active-tag { color: #fb923c; }
+
+      .node-current-progress {
+        background: rgba(15, 23, 42, 0.7);
+        border-radius: 12px;
+        padding: 8px 12px;
+        margin-bottom: 14px;
+
+        .progress-info {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.82rem;
+          color: #e2e8f0;
+          font-weight: 700;
+          margin-bottom: 6px;
+        }
+
+        ion-progress-bar {
+          height: 8px;
+          border-radius: 4px;
+        }
+      }
+
+      .launch-mission-btn {
+        --background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        --color: #ffffff;
+        --border-radius: 16px;
+        font-size: 1.1rem;
+        font-weight: 900;
+        height: 52px;
+        box-shadow: 0 4px 18px rgba(234, 88, 12, 0.45);
+      }
+    }
+  }
+
+  /* ESTADO: Niveles Bloqueados */
+  &.locked {
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+
+    .node-status-icon {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    .node-card.locked-card {
+      border-color: #334155;
+      background: rgba(15, 23, 42, 0.75);
+
+      .locked-tag { color: #94a3b8; }
+      .node-title { color: #94a3b8; }
+      .node-desc { color: #64748b; }
+
+      .node-lock-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .lock-requirement {
+          color: #94a3b8;
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}
+
+/* Conectores verticales de la ruta */
+.trail-connector {
+  position: relative;
+  width: 44px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 21px;
+    width: 2px;
+    background: #334155;
+  }
+
+  &.active-connector::before {
+    background: linear-gradient(to bottom, #10b981, #f97316);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+  }
+
+  .energy-pulse {
+    width: 8px;
+    height: 8px;
+    background: #f97316;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #f97316;
+    z-index: 1;
+    animation: moveEnergy 1.5s infinite linear;
+  }
+
+  .lock-connector-icon {
+    font-size: 0.8rem;
+    background: #0f172a;
+    padding: 2px;
+    z-index: 1;
+  }
+}
+
+@keyframes pulseAura {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.6); }
+  70% { box-shadow: 0 0 0 14px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+@keyframes moveEnergy {
+  0% { transform: translateY(-14px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+
+/* ========================================================
+   4. SIMULADORES Y MISIONES ESPECIALES
+======================================================== */
+.specials-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 30px;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.special-card {
+  position: relative;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: #60a5fa;
+  }
+
+  .special-lock-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.9);
+    color: #fbbf24;
+    border: 1px solid #78350f;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+
+  .special-icon {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+
+  .special-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+  }
+
+  .special-desc {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin: 0 0 12px 0;
+  }
+
+  .special-tags {
+    display: flex;
+    gap: 6px;
+
+    span {
+      background: rgba(15, 23, 42, 0.6);
+      color: #38bdf8;
+      border: 1px solid #0369a1;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+  }
+}
+
+/* ========================================================
+   5. MURO DE MEDALLAS ESTELARES
+======================================================== */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 30px;
+
+  @media (max-width: 580px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 360px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.badge-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .badge-icon-box {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    background: #f1f5f9;
+
+    .badge-lock-indicator {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      font-size: 0.85rem;
+    }
+  }
+
+  .badge-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+  }
+
+  .badge-desc {
+    font-size: 0.72rem;
+    color: #64748b;
+    line-height: 1.3;
+    margin: 0 0 10px 0;
+    flex: 1;
+  }
+
+  .badge-status-pill {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    color: #475569;
+
+    &.unlocked-pill {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+    }
+  }
+
+  &.unlocked {
+    border-color: #fbbf24;
+    background: #fffbeb;
+
+    .badge-icon-box {
+      background: #fef3c7;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+  }
+
+  &.locked {
+    opacity: 0.75;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+
+    .badge-title { color: #64748b; }
+  }
+}
+
+/* ========================================================
+   6. TELEMETRÍA Y MÉTRICAS
+======================================================== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 15px;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  border: 2px solid transparent;
+
+  .metric-icon {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+
+  .metric-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  &.card-average {
+    border-color: #fbbf24;
+    background: #fffbeb;
+    .metric-value { color: #b45309; }
+  }
+
+  &.card-missions {
+    border-color: #38bdf8;
+    background: #f0f9ff;
+    .metric-value { color: #0369a1; }
+  }
+
+  &.card-best {
+    border-color: #4ade80;
+    background: #f0fdf4;
+    .metric-value { color: #15803d; }
+  }
+}
+
+.strengths-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 15px;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skill-highlight-card {
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 2px solid;
+
+  .highlight-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .highlight-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .skill-icon {
+      font-size: 1.8rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin: 0;
+      color: #0f172a;
+    }
+
+    .highlight-score {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 2px 0 0 0;
+    }
+  }
+
+  &.strong-card {
+    background: #f0fdf4;
+    border-color: #86efac;
+    .highlight-tag { color: #166534; }
+    .highlight-score { color: #15803d; }
+  }
+
+  &.weak-card {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    .highlight-tag { color: #9a3412; }
+    .highlight-score { color: #c2410c; }
+  }
+}
+
+.skills-breakdown-card {
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin: 0 0 25px 0;
+
+  .breakdown-title {
+    color: #0f172a;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 14px 0;
+  }
+
+  .skill-item {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 4px;
+    }
+
+    .skill-labels {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #334155;
+      margin-bottom: 4px;
+
+      .skill-score-val {
+        color: #0f172a;
+        font-weight: 800;
+      }
+    }
+
+    ion-progress-bar {
+      height: 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+/* ========================================================
+   7. HISTORIAL DE EVALUACIONES
+======================================================== */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+
+  .cloud-badge {
+    background: #0284c7;
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.loading-history {
+  padding: 30px 0;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.empty-history-card {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 22px;
+  border: 2px dashed #475569;
+  padding: 24px 16px;
+  text-align: center;
+  margin-bottom: 25px;
+
+  .empty-instruction {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    max-width: 440px;
+    margin: 15px auto 0 auto;
+    line-height: 1.4;
+  }
+}
+
+.attempts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.attempt-card {
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  margin: 0;
+
+  .attempt-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .attempt-info {
+      display: flex;
+      flex-direction: column;
+
+      .attempt-index {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .attempt-date {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-top: 2px;
+      }
+    }
+
+    .score-pill {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 900;
+      font-size: 1.15rem;
+
+      &.gold {
+        background: #fef3c7;
+        color: #92400e;
+        border: 2px solid #f59e0b;
+      }
+
+      &.silver {
+        background: #e0f2fe;
+        color: #075985;
+        border: 2px solid #38bdf8;
+      }
+    }
+  }
+
+  .attempt-level {
+    font-size: 0.9rem;
+    color: #475569;
+    margin-bottom: 12px;
+
+    strong {
+      color: #0284c7;
+    }
+  }
+
+  .attempt-skills-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .mini-chip {
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+  }
+}
+
+/* ========================================================
+   8. MODAL DE PERFIL DE USUARIO CÓSMICO
+======================================================== */
+.profile-modal {
+  --border-radius: 24px;
+  --max-width: 520px;
+}
+
+.profile-modal-content {
+  --background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 100%);
+  color: #ffffff;
+}
+
+.modal-profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.modal-avatar-preview {
+  position: relative;
+  margin-bottom: 12px;
+
+  .current-avatar-display {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 4px solid #38bdf8;
+    font-size: 3.2rem;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+  }
+
+  .avatar-title-badge {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    border: 2px solid #0f172a;
+  }
+}
+
+.modal-cadet-name {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 12px 0 2px 0;
+}
+
+.modal-cadet-id {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  font-family: monospace;
+}
+
+.avatar-selector-section, .cadet-name-edit-box {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+.modal-field-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #38bdf8;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.avatars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+
+  .avatar-option-btn {
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 14px;
+    padding: 10px 0;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      transform: scale(1.08);
+      border-color: #38bdf8;
+    }
+
+    &.active-avatar {
+      border-color: #f59e0b;
+      background: #78350f;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    }
+  }
+}
+
+.custom-input-wrap {
+  width: 100%;
+
+  .custom-cadet-input {
+    width: 100%;
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+  }
+}
+
+.expedient-stats-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+
+  .exp-stat-item {
+    background: #1e293b;
+    border-radius: 14px;
+    padding: 10px;
+    border: 1px solid #334155;
+
+    .exp-icon {
+      font-size: 1.3rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .exp-val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #38bdf8;
+      display: block;
+    }
+
+    .exp-lbl {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.account-details-box {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 22px;
+  text-align: left;
+
+  .account-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .acc-label {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .acc-val {
+      color: #f1f5f9;
+      font-weight: 700;
+    }
+  }
+}
+
+.modal-actions-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .save-profile-btn {
+    --background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    --color: #ffffff;
+    --border-radius: 14px;
+    font-weight: 800;
+    font-size: 1rem;
+    height: 48px;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+  }
+
+  .modal-logout-btn {
+    --border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    height: 44px;
+  }
+}

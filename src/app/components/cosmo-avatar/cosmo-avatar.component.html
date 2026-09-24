@@ -1,0 +1,52 @@
+<div class="cosmo-container" [ngClass]="['size-' + size, 'mood-' + mood]">
+  <!-- Bocadillo de diálogo cuando hay mensaje -->
+  <div class="cosmo-bubble" *ngIf="message">
+    <div class="bubble-tail"></div>
+    <span class="bubble-text">{{ message }}</span>
+  </div>
+
+  <!-- Ilustración SVG vectorial de Cosmo: Gato Marciano Rojo con Traje de Astronauta -->
+  <div class="cosmo-svg-wrapper">
+    <svg viewBox="0 0 200 220" class="cosmo-svg" xmlns="http://www.w3.org/2000/svg">
+      <!-- Antena del casco -->
+      <line x1="100" y1="35" x2="100" y2="10" stroke="#FF5722" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="100" cy="8" r="7" fill="#FFC107" class="antenna-light"/>
+
+      <!-- Casco espacial de cristal -->
+      <circle cx="100" cy="95" r="75" fill="#E1F5FE" stroke="#B0BEC5" stroke-width="6" opacity="0.95"/>
+      <ellipse cx="75" cy="65" rx="20" ry="12" fill="#FFFFFF" opacity="0.6" transform="rotate(-30 75 65)"/>
+
+      <!-- Orejas de gato rojas dentro de la silueta del casco -->
+      <polygon points="50,75 70,30 90,65" fill="#FF5722" stroke="#D84315" stroke-width="3"/>
+      <polygon points="60,70 72,40 82,65" fill="#FF8A65"/>
+      <polygon points="110,65 130,30 150,75" fill="#FF5722" stroke="#D84315" stroke-width="3"/>
+      <polygon points="118,65 128,40 140,70" fill="#FF8A65"/>
+
+      <!-- Cabeza del gato rojo -->
+      <circle cx="100" cy="100" r="48" fill="#FF5722"/>
+
+      <!-- Ojos grandes y amigables estilo anime/cartoon -->
+      <ellipse cx="82" cy="95" rx="10" ry="12" fill="#263238" class="cosmo-eye"/>
+      <circle cx="85" cy="91" r="4" fill="#FFFFFF"/>
+      <ellipse cx="118" cy="95" rx="10" ry="12" fill="#263238" class="cosmo-eye"/>
+      <circle cx="121" cy="91" r="4" fill="#FFFFFF"/>
+
+      <!-- Nariz triangular y boca tierna de gatito -->
+      <polygon points="100,107 96,103 104,103" fill="#D84315"/>
+      <path d="M94 112 Q100 117 106 112" stroke="#263238" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+      <!-- Bigotes cósmicos -->
+      <line x1="60" y1="105" x2="45" y2="103" stroke="#D84315" stroke-width="2" stroke-linecap="round"/>
+      <line x1="60" y1="112" x2="42" y2="114" stroke="#D84315" stroke-width="2" stroke-linecap="round"/>
+      <line x1="140" y1="105" x2="155" y2="103" stroke="#D84315" stroke-width="2" stroke-linecap="round"/>
+      <line x1="140" y1="112" x2="158" y2="114" stroke="#D84315" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Cuello y traje espacial blanco con detalles rojos -->
+      <rect x="70" y="160" width="60" height="15" rx="5" fill="#D32F2F"/>
+      <path d="M50 175 Q100 165 150 175 L160 215 L40 215 Z" fill="#ECEFF1" stroke="#CFD8DC" stroke-width="3"/>
+      <!-- Insignia en el pecho de astronauta -->
+      <circle cx="100" cy="190" r="10" fill="#FF5722"/>
+      <polygon points="100,183 102,188 107,189 103,193 104,198 100,195 96,198 97,193 93,189 98,188" fill="#FFD54F"/>
+    </svg>
+  </div>
+</div>

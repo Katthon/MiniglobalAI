@@ -1,0 +1,537 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      🚀 Estación Espacial de Cadetes
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openProfileModal()" fill="solid" color="light" class="profile-header-btn">
+        <span class="btn-avatar">{{ user?.avatarIcon || '🧑‍🚀' }}</span>
+        <span class="btn-text">Mi Perfil</span>
+      </ion-button>
+      <ion-button (click)="logout()" fill="clear" color="light" class="logout-btn" title="Cerrar Sesión">
+        <span class="logout-text">🚪</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <div class="stars-bg"></div>
+
+  <div class="dashboard-container ion-padding" *ngIf="user">
+    
+    <!-- 1. TARJETA HERO DE PERFIL DEL CADETE -->
+    <div class="profile-hero-card" (click)="openProfileModal()">
+      <div class="profile-avatar-wrapper">
+        <img 
+          *ngIf="user.photoURL" 
+          [src]="user.photoURL" 
+          alt="Foto de perfil" 
+          class="user-google-photo" 
+          referrerpolicy="no-referrer" />
+        
+        <div *ngIf="!user.photoURL" class="default-avatar-badge">
+          <span>{{ user.avatarIcon || '🧑‍🚀' }}</span>
+        </div>
+        <span class="level-indicator-badge">Nv. {{ cadetLevel }}</span>
+      </div>
+
+      <div class="profile-details">
+        <div class="profile-header-row">
+          <span class="welcome-tag">✨ Mando Central Galáctico</span>
+          <ion-chip color="warning" class="xp-chip">
+            ⚡ {{ xpPoints }} XP
+          </ion-chip>
+        </div>
+        <h1 class="welcome-title">¡Hola, {{ user.displayName }}!</h1>
+        <p class="cadet-rank-subtitle">{{ rankTitle }}</p>
+
+        <!-- Barra de Progreso de XP hacia el próximo nivel -->
+        <div class="xp-progress-box">
+          <div class="xp-labels">
+            <span>Progreso a Nivel {{ cadetLevel + 1 }}</span>
+            <span>{{ Math.round(levelProgress * 100) }}%</span>
+          </div>
+          <ion-progress-bar [value]="levelProgress" color="warning"></ion-progress-bar>
+        </div>
+
+        <div class="profile-action-row">
+          <ion-badge color="tertiary" class="rank-badge">
+            🪐 Cuadrante A2
+          </ion-badge>
+          <span class="edit-profile-hint">
+            🪪 Ver Expediente / Editar Perfil ✏️
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. BANNER DE RACHA Y MISIÓN DIARIA -->
+    <div class="daily-mission-banner">
+      <div class="banner-item streak-box">
+        <span class="streak-icon">🔥</span>
+        <div>
+          <span class="banner-title">Racha Estelar</span>
+          <span class="banner-val">{{ streakDays }} días explorando</span>
+        </div>
+      </div>
+      <div class="banner-divider"></div>
+      <div class="banner-item challenge-box">
+        <span class="challenge-icon">🎯</span>
+        <div>
+          <span class="banner-title">Misión de Hoy</span>
+          <span class="banner-val">Logra 80%+ en A2 (+100 XP)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. RUTA DE APRENDIZAJE GALÁCTICA (CAMINO A B2) -->
+    <div class="roadmap-section">
+      <div class="section-title-wrap">
+        <h2 class="section-heading">🗺️ Ruta de Aprendizaje Galáctica</h2>
+        <span class="section-sub">Tu viaje desde la órbita terrestre hasta la maestría del cosmos</span>
+      </div>
+
+      <div class="roadmap-trail">
+        <!-- ESTACIÓN A1: SUPERADA -->
+        <div class="roadmap-node completed">
+          <div class="node-status-icon">✅</div>
+          <div class="node-card">
+            <div class="node-header">
+              <span class="node-tag completed-tag">Nivel A1 · Conquistado</span>
+              <span class="node-icon">🪐</span>
+            </div>
+            <h3 class="node-title">Base Terrestre & Órbita Inicial</h3>
+            <p class="node-desc">Saludos cósmicos, números galácticos, colores y presente simple dominados al 100%.</p>
+            <div class="node-meta">
+              <ion-badge color="success">⭐ 3/3 Estrellas</ion-badge>
+              <span class="node-status-text">Fundamentos aprobados</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONECTOR ACTIVO -->
+        <div class="trail-connector active-connector">
+          <div class="energy-pulse"></div>
+        </div>
+
+        <!-- ESTACIÓN A2: ACTIVA (MISIÓN EN CURSO) -->
+        <div class="roadmap-node active-mission">
+          <div class="node-status-icon pulse-icon">🚀</div>
+          <div class="node-card active-card">
+            <div class="node-header">
+              <span class="node-tag active-tag">Nivel A2 · Misión Activa</span>
+              <span class="node-icon">🐱</span>
+            </div>
+            <h3 class="node-title">Explorador Estelar con Cosmo</h3>
+            <p class="node-desc">
+              10 desafíos interactivos: pasado simple, listening desde la base de control, speaking por voz y tips de Cosmo.
+            </p>
+
+            <div class="node-current-progress" *ngIf="bestScore > 0">
+              <div class="progress-info">
+                <span>Mejor Puntuación A2:</span>
+                <strong>{{ bestScore }}%</strong>
+              </div>
+              <ion-progress-bar [value]="bestScore / 100" color="tertiary"></ion-progress-bar>
+            </div>
+
+            <!-- Botón principal de lanzamiento -->
+            <ion-button 
+              expand="block" 
+              size="large" 
+              class="launch-mission-btn"
+              (click)="startNewAssessment()">
+              🚀 ¡Iniciar Evaluación A2 Ahora!
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- CONECTOR BLOQUEADO -->
+        <div class="trail-connector locked-connector">
+          <span class="lock-connector-icon">🔒</span>
+        </div>
+
+        <!-- ESTACIÓN B1: BLOQUEADA -->
+        <div class="roadmap-node locked" (click)="showLockedAlert('Nivel B1: Cinturón de Asteroides', 'Requiere obtener al menos 80% en tu evaluación A2 para abrir esta ruta interestelar.')">
+          <div class="node-status-icon lock-icon">🔒</div>
+          <div class="node-card locked-card">
+            <div class="node-header">
+              <span class="node-tag locked-tag">Nivel B1 · Próxima Estación</span>
+              <span class="node-icon">🛸</span>
+            </div>
+            <h3 class="node-title">Comandante del Cinturón de Asteroides</h3>
+            <p class="node-desc">
+              Navegación espacial intermedia: past continuous, condicionales estelares, debates de tripulación y reportes técnicos en inglés.
+            </p>
+            <div class="node-lock-footer">
+              <ion-badge color="medium">🔒 Bloqueado por Cosmo</ion-badge>
+              <span class="lock-requirement">Req. 80%+ en A2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONECTOR BLOQUEADO -->
+        <div class="trail-connector locked-connector">
+          <span class="lock-connector-icon">🔒</span>
+        </div>
+
+        <!-- ESTACIÓN B2: BLOQUEADA (META GALÁCTICA) -->
+        <div class="roadmap-node locked" (click)="showLockedAlert('Nivel B2: Gran Estación Galáctica', '¡Sector clasificado de mando supremo! Completa primero las órbitas A2 y B1.')">
+          <div class="node-status-icon lock-icon">🌌</div>
+          <div class="node-card locked-card">
+            <div class="node-header">
+              <span class="node-tag locked-tag">Nivel B2 · Destino Final</span>
+              <span class="node-icon">👑</span>
+            </div>
+            <h3 class="node-title">Maestro Supremo de la Galaxia</h3>
+            <p class="node-desc">
+              Fluidez total y autonomía en inglés: telemetría alienígena avanzada, negociaciones cósmicas y bitácoras astrofísicas.
+            </p>
+            <div class="node-lock-footer">
+              <ion-badge color="dark">🔒 Cuadrante Clasificado</ion-badge>
+              <span class="lock-requirement">Certificación B1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SIMULADORES Y MISIONES ESPECIALES (BLOQUEADOS) -->
+    <div class="specials-section">
+      <div class="section-title-wrap">
+        <h2 class="section-heading">🛰️ Simuladores de Entrenamiento Especial</h2>
+        <span class="section-sub">Laboratorios espaciales en calibración por Cosmo (Próximamente)</span>
+      </div>
+
+      <div class="specials-grid">
+        <!-- Tarjeta 1: Speaking Studio -->
+        <div class="special-card" (click)="showLockedAlert('Simulador de Radio Estelar', 'Cosmo está alineando la antena de Marte para la práctica de fonética y conversación en vivo.')">
+          <div class="special-lock-badge">🔒 Próximamente</div>
+          <div class="special-icon">🎙️</div>
+          <h3 class="special-title">Radio Comm Studio</h3>
+          <p class="special-desc">Práctica libre de pronunciación palabra por palabra con el sintetizador de Marte.</p>
+          <div class="special-tags">
+            <span>Speaking Pro</span>
+            <span>Audio AI</span>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2: Listening Lab -->
+        <div class="special-card" (click)="showLockedAlert('Radar de Frecuencias Alienígenas', 'Las grabaciones interestelares se están decodificando en el laboratorio.')">
+          <div class="special-lock-badge">🔒 Próximamente</div>
+          <div class="special-icon">🎧</div>
+          <h3 class="special-title">Alien Signals Radar</h3>
+          <p class="special-desc">Descifra transmisiones de audio a distintas velocidades para agudizar tu oído espacial.</p>
+          <div class="special-tags">
+            <span>Listening Lab</span>
+            <span>Speed Pitch</span>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3: Speed Drill -->
+        <div class="special-card" (click)="showLockedAlert('Lluvia de Meteoros Contrarreloj', 'Alerta de meteoros programada para futuras actualizaciones de la flota.')">
+          <div class="special-lock-badge">🔒 Próximamente</div>
+          <div class="special-icon">⚡</div>
+          <h3 class="special-title">Meteor Speed Drill</h3>
+          <p class="special-desc">Desafío relámpago de 60 segundos: destruye meteoros respondiendo verbos y vocabulario.</p>
+          <div class="special-tags">
+            <span>Arcade</span>
+            <span>Vocab Run</span>
+          </div>
+        </div>
+
+        <!-- Tarjeta 4: Space Logs -->
+        <div class="special-card" (click)="showLockedAlert('Bitácora Galáctica de Lectura', 'La biblioteca estelar está digitalizando los antiguos códices de la galaxia.')">
+          <div class="special-lock-badge">🔒 Próximamente</div>
+          <div class="special-icon">📖</div>
+          <h3 class="special-title">Cosmic Story Vault</h3>
+          <p class="special-desc">Historias interactivas ilustradas donde tus respuestas en inglés deciden el rumbo del cohete.</p>
+          <div class="special-tags">
+            <span>Reading Quest</span>
+            <span>Storyline</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. MURO DE MEDALLAS Y LOGROS ESTELARES -->
+    <div class="badges-section">
+      <div class="section-title-wrap">
+        <h2 class="section-heading">🏆 Muro de Medallas Estelares</h2>
+        <span class="section-sub">Insignias oficiales otorgadas por el Alto Mando Cósmico</span>
+      </div>
+
+      <div class="badges-grid">
+        <div 
+          class="badge-card" 
+          *ngFor="let b of badges" 
+          [class.unlocked]="b.unlocked" 
+          [class.locked]="!b.unlocked">
+          <div class="badge-icon-box">
+            <span class="badge-icon">{{ b.icon }}</span>
+            <span class="badge-lock-indicator" *ngIf="!b.unlocked">🔒</span>
+          </div>
+          <h4 class="badge-title">{{ b.title }}</h4>
+          <p class="badge-desc">{{ b.desc }}</p>
+          <span class="badge-status-pill" [class.unlocked-pill]="b.unlocked">
+            {{ b.unlocked ? '✨ Conseguido' : '🔒 Por desbloquear' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MÉTRICAS DE RENDIMIENTO Y NOTAS -->
+    <div class="metrics-section">
+      <div class="section-title-wrap">
+        <h2 class="section-heading">📊 Telemetría y Rendimiento</h2>
+        <span class="section-sub">Calibración de habilidades y estadísticas de tu nave</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card card-average">
+          <div class="metric-icon">⭐</div>
+          <div class="metric-value">{{ averageScore }}%</div>
+          <div class="metric-label">Puntaje Promedio</div>
+        </div>
+
+        <div class="metric-card card-missions">
+          <div class="metric-icon">🛸</div>
+          <div class="metric-value">{{ attempts.length }}</div>
+          <div class="metric-label">Misiones Evaluadas</div>
+        </div>
+
+        <div class="metric-card card-best">
+          <div class="metric-icon">🏆</div>
+          <div class="metric-value">{{ bestScore }}%</div>
+          <div class="metric-label">Récord Máximo</div>
+        </div>
+      </div>
+
+      <!-- Destacados de Habilidad Fuerte y Débil -->
+      <div class="strengths-grid" *ngIf="attempts.length > 0">
+        <div class="skill-highlight-card strong-card" *ngIf="strongestSkill">
+          <span class="highlight-tag">🌟 Habilidad Más Fuerte</span>
+          <div class="highlight-info">
+            <span class="skill-icon">{{ strongestSkill.icon }}</span>
+            <div>
+              <h3>{{ strongestSkill.name }}</h3>
+              <p class="highlight-score">{{ strongestSkill.score }}% de aciertos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-highlight-card weak-card" *ngIf="weakestSkill">
+          <span class="highlight-tag">🎯 Habilidad a Reforzar</span>
+          <div class="highlight-info">
+            <span class="skill-icon">{{ weakestSkill.icon }}</span>
+            <div>
+              <h3>{{ weakestSkill.name }}</h3>
+              <p class="highlight-score">{{ weakestSkill.score }}% de aciertos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desglose Global de Habilidades -->
+      <ion-card class="skills-breakdown-card" *ngIf="attempts.length > 0">
+        <ion-card-content>
+          <h3 class="breakdown-title">📡 Calibración Promedio por Habilidad</h3>
+          
+          <div class="skill-item" *ngFor="let s of skillAverages">
+            <div class="skill-labels">
+              <span class="skill-name">{{ s.icon }} {{ s.name }}</span>
+              <span class="skill-score-val">{{ s.score }}%</span>
+            </div>
+            <ion-progress-bar 
+              [value]="s.score / 100" 
+              [color]="s.score >= 80 ? 'success' : (s.score >= 50 ? 'warning' : 'danger')">
+            </ion-progress-bar>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- 7. HISTORIAL DE PROGRESO (Firebase RTDB) -->
+    <div class="history-section">
+      <div class="history-header">
+        <h2 class="section-heading">📜 Historial de Evaluaciones</h2>
+        <span class="cloud-badge" *ngIf="attempts.length > 0">📡 Sincronizado en la Nube</span>
+      </div>
+
+      <!-- Estado de Carga -->
+      <div class="loading-history ion-text-center" *ngIf="isLoading">
+        <ion-spinner name="crescent" color="tertiary"></ion-spinner>
+        <p>Consultando bitácora de vuelo en Firebase...</p>
+      </div>
+
+      <!-- Estado Vacío -->
+      <div class="empty-history-card" *ngIf="!isLoading && attempts.length === 0">
+        <app-cosmo-avatar 
+          size="medium" 
+          mood="happy"
+          message="¡Aún no has completado ninguna misión espacial! Presiona el botón del Nivel A2 para iniciar tu primera evaluación.">
+        </app-cosmo-avatar>
+        <p class="empty-instruction">
+          Cosmo está listo para registrar tus calificaciones, XP y medallas en tu bitácora personal.
+        </p>
+      </div>
+
+      <!-- Lista de Intentos Pasados -->
+      <div class="attempts-list" *ngIf="!isLoading && attempts.length > 0">
+        <ion-card class="attempt-card" *ngFor="let att of attempts; let i = index">
+          <ion-card-content>
+            <div class="attempt-top-row">
+              <div class="attempt-info">
+                <span class="attempt-index">Misión #{{ attempts.length - i }}</span>
+                <span class="attempt-date">📅 {{ formatDate(att.completedAt) }}</span>
+              </div>
+              <div class="score-pill" [class.gold]="att.score >= 80" [class.silver]="att.score >= 50 && att.score < 80">
+                <span class="score-pill-number">{{ att.score }}%</span>
+              </div>
+            </div>
+
+            <div class="attempt-level">
+              Rango obtenido: <strong>{{ att.level }}</strong>
+            </div>
+
+            <!-- Mini badges de cada habilidad en este intento -->
+            <div class="attempt-skills-chips">
+              <span class="mini-chip">📝 Grammar: {{ att.skills.grammar }}%</span>
+              <span class="mini-chip">📚 Vocab: {{ att.skills.vocabulary }}%</span>
+              <span class="mini-chip">📖 Reading: {{ att.skills.reading }}%</span>
+              <span class="mini-chip">🎧 Listening: {{ att.skills.listening }}%</span>
+              <span class="mini-chip">🎙️ Speaking: {{ att.skills.speaking }}%</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- MODAL COMPLETO DE PERFIL DE USUARIO CÓSMICO -->
+<ion-modal [isOpen]="isProfileModalOpen" (didDismiss)="closeProfileModal()" class="profile-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>🧑‍🚀 Expediente del Cadete</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeProfileModal()" fill="clear" color="light">
+            ✕
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="profile-modal-content ion-padding" *ngIf="user">
+      <div class="modal-profile-card">
+        
+        <!-- Vista previa del Avatar -->
+        <div class="modal-avatar-preview">
+          <span class="current-avatar-display">{{ selectedAvatar }}</span>
+          <span class="avatar-title-badge">{{ rankTitle }}</span>
+        </div>
+
+        <h2 class="modal-cadet-name">{{ editDisplayName || user.displayName }}</h2>
+        <p class="modal-cadet-id">ID Tripulación: CADET-{{ user.uid.substring(0, 6).toUpperCase() }}</p>
+
+        <!-- Selector de Avatares Cósmicos -->
+        <div class="avatar-selector-section">
+          <label class="modal-field-label">Selecciona tu Casco o Acompañante Cósmico:</label>
+          <div class="avatars-grid">
+            <button 
+              type="button"
+              class="avatar-option-btn" 
+              *ngFor="let av of availableAvatars" 
+              [class.active-avatar]="selectedAvatar === av"
+              (click)="selectAvatar(av)">
+              <span>{{ av }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Edición de Nombre / Indicativo de Cadete -->
+        <div class="cadet-name-edit-box">
+          <label class="modal-field-label">Nombre o Indicativo de Llamada:</label>
+          <div class="custom-input-wrap">
+            <input 
+              type="text" 
+              [(ngModel)]="editDisplayName" 
+              class="custom-cadet-input" 
+              placeholder="Escribe tu nombre de astronauta..." 
+              maxlength="24" />
+          </div>
+        </div>
+
+        <!-- Estadísticas del Expediente -->
+        <div class="expedient-stats-grid">
+          <div class="exp-stat-item">
+            <span class="exp-icon">⚡</span>
+            <span class="exp-val">{{ xpPoints }}</span>
+            <span class="exp-lbl">Puntos XP</span>
+          </div>
+          <div class="exp-stat-item">
+            <span class="exp-icon">⭐</span>
+            <span class="exp-val">Nv. {{ cadetLevel }}</span>
+            <span class="exp-lbl">Rango Actual</span>
+          </div>
+          <div class="exp-stat-item">
+            <span class="exp-icon">🛸</span>
+            <span class="exp-val">{{ attempts.length }}</span>
+            <span class="exp-lbl">Misiones</span>
+          </div>
+        </div>
+
+        <!-- Detalles de Cuenta y Conexión -->
+        <div class="account-details-box">
+          <div class="account-row">
+            <span class="acc-label">Tipo de Conexión:</span>
+            <span class="acc-val" *ngIf="user.email">🌐 Cuenta Google ({{ user.email }})</span>
+            <span class="acc-val" *ngIf="!user.email">🛸 Cadete Anónimo Libre</span>
+          </div>
+          <div class="account-row">
+            <span class="acc-label">Base de Datos:</span>
+            <span class="acc-val">🛰️ Firebase Realtime Database</span>
+          </div>
+          <div class="account-row">
+            <span class="acc-label">Fecha de Ingreso:</span>
+            <span class="acc-val">{{ formatDate(user.createdAt) }}</span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="modal-actions-row">
+          <ion-button 
+            expand="block" 
+            class="save-profile-btn" 
+            [disabled]="isSavingProfile || !editDisplayName.trim()" 
+            (click)="saveProfile()">
+            <ion-spinner name="crescent" *ngIf="isSavingProfile"></ion-spinner>
+            <span *ngIf="!isSavingProfile">💾 Guardar Expediente Estelar</span>
+          </ion-button>
+          
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            color="danger" 
+            class="modal-logout-btn" 
+            (click)="closeProfileModal(); logout()">
+            🚪 Cerrar Sesión Galáctica
+          </ion-button>
+        </div>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- TOAST DE NOTIFICACIÓN ESPACIAL INTERACTIVO -->
+<ion-toast 
+  [isOpen]="isToastOpen" 
+  [message]="toastMessage" 
+  [duration]="3500" 
+  [color]="toastColor"
+  (didDismiss)="isToastOpen = false">
+</ion-toast>

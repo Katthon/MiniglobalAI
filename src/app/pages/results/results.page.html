@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title class="ion-text-center">
+      🏆 Reporte de Vuelo Espacial
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="results-content">
+  <div class="stars-bg"></div>
+
+  <div class="results-container ion-padding" *ngIf="attempt && feedback">
+    
+    <!-- TARJETA DE PUNTAJE GLOBAL -->
+    <div class="score-hero-card">
+      <div class="badge-ring" [class.badge-gold]="attempt.score >= 80" [class.badge-silver]="attempt.score >= 50 && attempt.score < 80">
+        <span class="score-number">{{ attempt.score }}%</span>
+        <span class="score-label">Puntaje Estelar</span>
+      </div>
+
+      <h1 class="student-congrats">
+        ¡Gran trabajo, {{ attempt.studentName }}!
+      </h1>
+      <p class="cadet-rank">Rango alcanzado: <strong>{{ attempt.level }}</strong></p>
+    </div>
+
+    <!-- SECCIÓN INTERACTIVA DE COSMO -->
+    <ion-card class="cosmo-feedback-card">
+      <ion-card-content>
+        <div class="cosmo-header-row">
+          <app-cosmo-avatar 
+            size="medium" 
+            [mood]="feedback.mood === 'celebration' ? 'celebration' : 'talking'">
+          </app-cosmo-avatar>
+        </div>
+
+        <!-- Mensaje en pantalla con emojis -->
+        <div class="display-bubble">
+          <span class="bubble-tag">Mensaje de Cosmo:</span>
+          <p class="display-text">{{ feedback.displayMessage }}</p>
+        </div>
+
+        <!-- Control de voz Web Speech API (Cosmo habla) -->
+        <div class="voice-actions">
+          <button 
+            type="button"
+            class="listen-btn" 
+            [class.speaking]="isSpeakingCosmo"
+            (click)="isSpeakingCosmo ? stopCosmoVoice() : playCosmoVoice()">
+            <span>{{ isSpeakingCosmo ? '⏸️ Pausar Voz de Cosmo' : '🔊 Escuchar a Cosmo Hablar' }}</span>
+          </button>
+        </div>
+
+        <div class="transcription-quote">
+          <span class="quote-icon">🎙️</span>
+          <em>"{{ feedback.spokenFeedback }}"</em>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- DESGLOSE POR HABILIDADES (SKILLS BREAKDOWN) -->
+    <ion-card class="skills-card">
+      <ion-card-content>
+        <h3 class="card-title">📡 Calibración por Habilidades</h3>
+        
+        <div class="skill-row" *ngFor="let s of skillsList">
+          <div class="skill-info">
+            <span class="skill-icon-label">{{ s.icon }} {{ s.label }}</span>
+            <span class="skill-percentage" [class.low-skill]="s.label === feedback.focusSkill">
+              {{ s.score }}%
+            </span>
+          </div>
+          <ion-progress-bar 
+            [value]="s.score / 100" 
+            [color]="s.score >= 80 ? 'success' : (s.score >= 50 ? 'warning' : 'danger')">
+          </ion-progress-bar>
+        </div>
+
+        <!-- Enfoque de Práctica Recomendado -->
+        <div class="focus-mission-box">
+          <span class="focus-title">🎯 Próxima Misión de Entrenamiento:</span>
+          <p class="focus-desc">
+            Cosmo recomienda reforzar <strong>{{ feedback.focusSkill }}</strong> para alcanzar el siguiente nivel cósmico.
+          </p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- BOTONES FINALES -->
+    <div class="bottom-actions">
+      <ion-button expand="block" size="large" class="dashboard-btn" (click)="goToDashboard()">
+        📊 Volver al Dashboard del Estudiante
+      </ion-button>
+      <ion-button expand="block" fill="outline" color="light" class="restart-btn" (click)="restart()">
+        🔄 Repetir Evaluación
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
