@@ -291,6 +291,41 @@
     font-weight: 700;
     color: #334155;
     margin-bottom: 8px;
+    font-size: 1.05rem;
+  }
+
+  .fill-input-wrapper {
+    margin: 8px 0;
+  }
+
+  .fill-ion-input {
+    --background: #f8fafc;
+    --color: #0f172a;
+    --placeholder-color: #94a3b8;
+    --border-color: #94a3b8;
+    --border-radius: 16px;
+    --border-width: 2px;
+    --highlight-color-focused: #0284c7;
+    font-size: 1.2rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      --border-color: #0284c7;
+      box-shadow: 0 0 12px rgba(2, 132, 199, 0.3);
+    }
+  }
+
+  .fill-feedback {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: #0284c7;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: #e0f2fe;
+    border-radius: 10px;
+    display: inline-block;
   }
 
   .fill-input {

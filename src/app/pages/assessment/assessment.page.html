@@ -101,13 +101,13 @@
           </div>
         </div>
 
-        <!-- Contexto o Pasaje para otras habilidades (Reading / Grammar) -->
+        <!-- Contexto o Pasaje para otras habilidades (Reading / Grammar / Fill-blank) -->
         <div class="question-context" *ngIf="currentQuestion.context && currentQuestion.skill !== 'listening'">
           <p>{{ currentQuestion.context }}</p>
         </div>
 
-        <!-- TIPO 1: OPCIÓN MÚLTIPLE / LECTURA / VOCABULARIO -->
-        <div *ngIf="currentQuestion.options && currentQuestion.type !== 'speaking'" class="options-grid">
+        <!-- TIPO 1: OPCIÓN MÚLTIPLE (Renderiza botones de opción cuando el tipo sea 'multiple-choice' o tenga opciones sin ser 'fill-blank' ni 'speaking') -->
+        <div *ngIf="(currentQuestion.type === 'multiple-choice' || (currentQuestion.type !== 'fill-blank' && currentQuestion.type !== 'speaking')) && currentQuestion.options && currentQuestion.options.length > 0" class="options-grid">
           <button 
             *ngFor="let opt of currentQuestion.options"
             type="button"
@@ -119,14 +119,28 @@
           </button>
         </div>
 
-        <!-- TIPO 2: COMPLETAR ESPACIO (Fill in the blank) -->
-        <div *ngIf="currentQuestion.type === 'fill-blank' && !currentQuestion.options" class="fill-blank-container">
-          <label class="fill-label">Escribe la palabra que falta:</label>
-          <input 
-            type="text" 
-            class="fill-input" 
-            [(ngModel)]="answers[currentQuestion.id]" 
-            placeholder="Escribe tu respuesta aquí...">
+        <!-- TIPO 2: COMPLETAR ESPACIO (Fill-in-the-blanks con ion-input) -->
+        <div *ngIf="currentQuestion.type === 'fill-blank'" class="fill-blank-container">
+          <label class="fill-label" for="fillBlankInput">✏️ Escribe la palabra que falta:</label>
+          <div class="fill-input-wrapper">
+            <ion-input 
+              id="fillBlankInput"
+              type="text" 
+              class="fill-ion-input" 
+              [(ngModel)]="answers[currentQuestion.id]" 
+              (ionInput)="onFillBlankInput($event)"
+              placeholder="Escribe tu respuesta aquí..."
+              fill="outline"
+              shape="round"
+              [clearInput]="true"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false">
+            </ion-input>
+          </div>
+          <p class="fill-feedback" *ngIf="answers[currentQuestion.id]">
+            <span>✨ Respuesta registrada: <strong>{{ answers[currentQuestion.id] }}</strong></span>
+          </p>
         </div>
 
         <!-- TIPO 3: SPEAKING CON WEB SPEECH API -->

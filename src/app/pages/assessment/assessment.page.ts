@@ -13,7 +13,8 @@ import {
   IonCardContent,
   IonButton,
   IonBadge,
-  IonSpinner
+  IonSpinner,
+  IonInput
 } from '@ionic/angular/standalone';
 import { QuestionPublic, StudentAnswers } from '../../models/assessment.model';
 import { FirebaseAssessmentService } from '../../services/firebase-assessment.service';
@@ -37,6 +38,7 @@ import { CosmoAvatarComponent } from '../../components/cosmo-avatar/cosmo-avatar
     IonButton,
     IonBadge,
     IonSpinner,
+    IonInput,
     CosmoAvatarComponent
   ],
   templateUrl: './assessment.page.html',
@@ -114,6 +116,15 @@ export class AssessmentPage implements OnInit, OnDestroy {
 
   public isOptionSelected(option: string): boolean {
     return this.currentQuestion ? this.answers[this.currentQuestion.id] === option : false;
+  }
+
+  /**
+   * Captura el texto ingresado en el campo <ion-input> para preguntas 'fill-blank'
+   */
+  public onFillBlankInput(event: any): void {
+    if (!this.currentQuestion) return;
+    const value = event?.detail?.value ?? event?.target?.value ?? '';
+    this.answers[this.currentQuestion.id] = value;
   }
 
   public async toggleRecording(): Promise<void> {
